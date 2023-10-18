@@ -1,4 +1,4 @@
-# 配置`application.yml`
+# 1. 配置`application.yml`
 
 ```yml
 wsj:
@@ -8,7 +8,7 @@ wsj:
       secret-key: xxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-# 调用
+# 2. 调用
 
 ```java
 //构建请求参数
@@ -39,7 +39,7 @@ apiDataFieldRequest.setParamsJson(requestParams);
 Map<String,Object> resultJson = myApiClient.invokeInterface(accessKey,secretKey, apiDataFieldRequest);
 ```
 
-# 使用案例
+# 3. 使用案例
 
 ```java
 // begin 构建请求参数
