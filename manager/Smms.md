@@ -1,4 +1,15 @@
-# 1. 配置 `application.yml`
+# 1. 导入依赖
+
+```xml
+<!-- https://mvnrepository.com/artifact/com.konghq/unirest-java -->
+<dependency>
+    <groupId>com.konghq</groupId>
+    <artifactId>unirest-java</artifactId>
+    <version>3.14.5</version>
+</dependency>
+```
+
+# 2. 配置 `application.yml`
 
 ```yml
 # SMMS对象存储
@@ -6,7 +17,7 @@ smms:
     token: xxxxxxxxxxxxxxxxxxxxx
 ```
 
-# 2. 写入`SmmsManager.java`
+# 3. 写入`SmmsManager.java`
 
 ```java
 import com.google.gson.Gson;
@@ -85,7 +96,7 @@ public class SmmsManager {
 }
 ```
 
-# 3. 示例
+# 4. 示例
 
 上传
 
