@@ -2,13 +2,11 @@
 
 ```yml
 # SMMS对象存储
-oss:
-  smms:
-    url: https://smms.app/api/v2
+smms:
     token: xxxxxxxxxxxxxxxxxxxxx
 ```
 
-# 2. 写入`OssSmmsManager.java`
+# 2. 写入`SmmsManager.java`
 
 ```java
 import com.google.gson.Gson;
@@ -24,12 +22,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class OssSmmsManager {
-
-    @Value("${oss.smms.url}")
-    private String url;
-    @Value("${oss.smms.token}")
+public class SmmsManager {
+    
+    @Value("${smms.token}")
     private String token;
+    
+    public static final String url = "https://smms.app/api/v2";
 
     public Map<String, Object> uploadImg(File file) {
         return doUpload(file);
@@ -92,7 +90,7 @@ public class OssSmmsManager {
 上传
 
 ```java
-Map<String, Object> res = ossSmmsManager.uploadImg("C:\\Users\\86178\\Desktop\\file\\win11壁纸\\61 (小).jpg");
+Map<String, Object> res = SmmsManager.uploadImg("C:\\Users\\86178\\Desktop\\file\\win11壁纸\\61 (小).jpg");
 
 // 返回结果 - 成功
 {
@@ -111,7 +109,7 @@ Map<String, Object> res = ossSmmsManager.uploadImg("C:\\Users\\86178\\Desktop\\f
 删除
 
 ```java
-Map<String, Object> res2 = ossSmmsManager.deleteImg("YCADqXkxUsvBw5mhFQLWNMgfIH");
+Map<String, Object> res2 = SmmsManager.deleteImg("YCADqXkxUsvBw5mhFQLWNMgfIH");
 
 {success=true, message=File delete success.}
 {success=false, message=File already deleted.}
@@ -123,10 +121,10 @@ Map<String, Object> res2 = ossSmmsManager.deleteImg("YCADqXkxUsvBw5mhFQLWNMgfIH"
 Map<String, Object> resultMap;
 try {
     // 上传
-    resultMap = ossSmmsManager.uploadImg(file);
+    resultMap = SmmsManager.uploadImg(file);
     // 删除原来的图片
     UserVO userVO = userService.getLoginUser(request);
-    ossSmmsManager.deleteImg(userVO.getAvatarHash());
+    SmmsManager.deleteImg(userVO.getAvatarHash());
 } catch (Exception e) {
     throw new BusinessException(ErrorCode.OPERATION_ERROR, "头像更新失败");
 }

@@ -3,7 +3,7 @@
 
 ## manager
 
-[OssSmms](https://github.com/vincent-nicky/special-java/blob/main/manager/OssSMms.md)
+[Smms](https://github.com/vincent-nicky/special-java/blob/main/manager/Smms.md)
 
 ## sdk
 
