@@ -7,3 +7,4 @@
 
 ## sdk
 
+[sdk-api-client](https://github.com/vincent-nicky/special-java/tree/main/sdk-api-client)
