@@ -1,4 +1,4 @@
-# special-java
+# common-java
 存储通用 config、manager、utils
 
 ## manager
