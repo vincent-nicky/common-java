@@ -40,14 +40,14 @@ import com.wsj.springbootinit.model.vo.SmmsVO;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-@Configuration
+@Component
 public class SmmsManager {
 
     public static final String url = "https://smms.app/api/v2";
@@ -116,7 +116,7 @@ public class SmmsManager {
 }
 ```
 
-## 4. 示例
+## 5. 示例
 
 上传
 
