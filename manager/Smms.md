@@ -1,4 +1,4 @@
-# 1. 导入依赖
+## 1. 导入依赖
 
 ```xml
 <!-- https://mvnrepository.com/artifact/com.konghq/unirest-java -->
@@ -9,7 +9,7 @@
 </dependency>
 ```
 
-# 2. 配置 `application.yml`
+## 2. 配置 `application.yml`
 
 ```yml
 # SMMS对象存储
@@ -17,11 +17,26 @@ smms:
     token: xxxxxxxxxxxxxxxxxxxxx
 ```
 
-# 3. 写入`SmmsManager.java`
+## 3. 写入`SmmsVO.java`
+
+```java
+import lombok.Data;
+
+@Data
+public class SmmsVO {
+    private Boolean success;
+    private String url;
+    private String hash;
+    private String message;
+}
+```
+
+## 4. 写入`SmmsManager.java`
 
 ```java
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.wsj.springbootinit.model.vo.SmmsVO;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,30 +49,34 @@ import java.util.Map;
 
 @Configuration
 public class SmmsManager {
-    
+
+    public static final String url = "https://smms.app/api/v2";
     @Value("${smms.token}")
     private String token;
-    
-    public static final String url = "https://smms.app/api/v2";
 
-    public Map<String, Object> uploadImg(File file) {
+    public SmmsVO uploadImg(File file) {
         return doUpload(file);
     }
 
-    public Map<String, Object> uploadImg(String filePath) {
+    public SmmsVO uploadImg(String filePath) {
         File file = new File(filePath);
         return doUpload(file);
     }
 
-    public Map<String, Object> deleteImg(String imgHash) {
+    public SmmsVO deleteImg(String imgHash) {
         // 使用unirest
         HttpResponse<String> response = Unirest.get(url + "/delete/" + imgHash)
                 .header("Authorization", token)
                 .asString();
-        return convertJsonToMap(response.getBody());
+        // Json转map
+        Map<String, Object> mapSource = convertJsonToMap(response.getBody());
+        SmmsVO smmsVO = new SmmsVO();
+        smmsVO.setSuccess((Boolean) mapSource.get("success"));
+        smmsVO.setMessage((String) mapSource.get("message"));
+        return smmsVO;
     }
 
-    private Map<String, Object> doUpload(File file) {
+    private SmmsVO doUpload(File file) {
         // 构造 Header
         Map<String, String> headerMap = new HashMap<>();
         headerMap.put("Authorization", token);
@@ -72,36 +91,37 @@ public class SmmsManager {
         // Json转map
         Map<String, Object> mapSource = convertJsonToMap(response.getBody());
         // 根据是否上传成功来构造返回值
-        Map<String, Object> result = new HashMap<>();
+        SmmsVO smmsVO = new SmmsVO();
         if ((Boolean) mapSource.get("success")) {
             Map<String, Object> mapData = (Map<String, Object>) mapSource.get("data");
-            result.put("success", true);
-            result.put("url", mapData.get("url"));
-            result.put("hash", mapData.get("hash"));
-            return result;
+            smmsVO.setSuccess(true);
+            smmsVO.setUrl((String) mapData.get("url"));
+            smmsVO.setHash((String) mapData.get("hash"));
+            return smmsVO;
         } else {
-            result.put("success", false);
-            result.put("url", mapSource.get("images"));
-            result.put("message", mapSource.get("code"));
-            return result;
+            smmsVO.setSuccess(false);
+            smmsVO.setUrl((String) mapSource.get("images"));
+            smmsVO.setMessage((String) mapSource.get("code"));
+            return smmsVO;
         }
     }
 
     private Map<String, Object> convertJsonToMap(String json) {
         // 使用TypeToken来保留Map<String, Object>的类型信息
-        Type type = new TypeToken<Map<String, Object>>() {}.getType();
+        Type type = new TypeToken<Map<String, Object>>() {
+        }.getType();
         // 将JSON字符串转换为Map
         return new Gson().fromJson(json, type);
     }
 }
 ```
 
-# 4. 示例
+## 4. 示例
 
 上传
 
 ```java
-Map<String, Object> res = SmmsManager.uploadImg("C:\\Users\\86178\\Desktop\\file\\win11壁纸\\61 (小).jpg");
+SmmsVO res = SmmsManager.uploadImg("C:\\Users\\86178\\Desktop\\file\\win11壁纸\\61 (小).jpg");
 
 // 返回结果 - 成功
 {
@@ -120,7 +140,7 @@ Map<String, Object> res = SmmsManager.uploadImg("C:\\Users\\86178\\Desktop\\file
 删除
 
 ```java
-Map<String, Object> res2 = SmmsManager.deleteImg("YCADqXkxUsvBw5mhFQLWNMgfIH");
+SmmsVO res2 = SmmsManager.deleteImg("YCADqXkxUsvBw5mhFQLWNMgfIH");
 
 {success=true, message=File delete success.}
 {success=false, message=File already deleted.}
@@ -129,15 +149,17 @@ Map<String, Object> res2 = SmmsManager.deleteImg("YCADqXkxUsvBw5mhFQLWNMgfIH");
 使用案例
 
 ```java
-Map<String, Object> resultMap;
-try {
-    // 上传
-    resultMap = SmmsManager.uploadImg(file);
-    // 删除原来的图片
-    UserVO userVO = userService.getLoginUser(request);
-    SmmsManager.deleteImg(userVO.getAvatarHash());
-} catch (Exception e) {
-    throw new BusinessException(ErrorCode.OPERATION_ERROR, "头像更新失败");
+@PostMapping("/userAvatar")
+public BaseResponse<SmmsVO> uploadUserAvatar(@RequestPart("file") File file) {
+    // 先删除图床中原有的图片再上传
+    if (smmsManager.deleteImg("here_is_imgHash").getSuccess()) {
+        SmmsVO smmsVO = smmsManager.uploadImg(file);
+        //String url = smmsVO.getUrl();
+        //String imgHash = smmsVO.getHash();
+        return ResultUtils.success(smmsVO);
+    } else {
+        throw new BusinessException(ErrorCode.OPERATION_ERROR, "更新头像失败");
+    }
 }
 ```
 
