@@ -9,7 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * YuApi 客户端配置
+ *  客户端配置
  *
  */
 @Configuration

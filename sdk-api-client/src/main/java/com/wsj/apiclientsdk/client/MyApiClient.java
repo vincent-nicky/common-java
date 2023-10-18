@@ -80,7 +80,7 @@ public class MyApiClient {
         }
         hashMap.put("accessKey", accessKey);
         hashMap.put("nonce", RandomUtil.randomNumbers(4));
-        String encodedBody = SecureUtil.md5(accessKey + headersJson);
+        String encodedBody = SecureUtil.md5(accessKey + "-headersJson-" +headersJson);
         hashMap.put("body", encodedBody);
         hashMap.put("timestamp", String.valueOf(System.currentTimeMillis() / 1000));
         hashMap.put("sign", genSign(encodedBody, secretKey));

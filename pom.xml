@@ -6,11 +6,13 @@
     <groupId>com.wsj</groupId>
     <artifactId>special-java</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+
     <name>special-java</name>
     <description>通用模板</description>
+    <packaging>pom</packaging>
 
     <modules>
-        <module></module>
+        <module>sdk-api-client</module>
     </modules>
 
 </project>
